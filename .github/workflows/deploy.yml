@@ -4,7 +4,7 @@ name: Deploy to Railway
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy-frontend:
