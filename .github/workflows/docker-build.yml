@@ -1,0 +1,57 @@
+name: CI - Build Backend & Frontend
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: swiftride
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      # Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup Node (for caching deps, tests, etc.)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      # Backend build
+      - name: Build Backend Docker image
+        run: |
+          docker build -t swiftride-backend ./apps/backend
+
+      # Frontend build
+      - name: Build Frontend Docker image
+        run: |
+          docker build -t swiftride-frontend ./apps/frontend
+
+      # Run tests if you have (example: backend)
+      - name: Run Backend Tests
+        working-directory: ./apps/backend
+        run: npm install && npm run test --if-present
+
+      # Run frontend lint/build check
+      - name: Run Frontend Checks
+        working-directory: ./apps/frontend
+        run: npm install && npm run build
