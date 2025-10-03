@@ -1,0 +1,32 @@
+.env
+node_modules
+.next
+dist
+.DS_Store
+*.log
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Output
+dist
+.next
+out
+coverage
+
+# Environment
+.env
+.env.local
+.env.development
+.env.production
+
+# Docker
+**/pgdata
+**/minio_data
+
+# OS files
+.DS_Store
+Thumbs.db
