@@ -4,18 +4,24 @@ import * as Sentry from '@sentry/node';
 import { Registry, collectDefaultMetrics } from 'prom-client';
 import type { Response } from 'express';
 import { PrismaService } from '../prisma.service';
+import { MinioService } from 'src/storage/minio.service';
 
 const register = new Registry();
 collectDefaultMetrics({ register });
 
 @Controller()
 export class AppController {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService,private minio: MinioService) {}
 
-  @Get('health')
-  getHealth() {
-    return { status: 'ok', service: 'backend' };
-  }
+ @Get('health')
+async healthCheck() {
+  return {
+    status: 'ok',
+    database: this.prisma.isConnected() ? 'connected' : 'disconnected',
+    minio: this.minio.getClient() ? 'connected' : 'disconnected',
+  };
+}
+
 
   @Get('error')
   getError() {
